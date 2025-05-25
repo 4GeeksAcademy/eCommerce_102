@@ -45,16 +45,16 @@ def register_user():
 
     return { "message": "El usuario ha sido registrado exitosamente" }, 200
     
-@api.route('/login', methods = ['POST'])
-def login():
+@api.route('/token', methods = ['POST'])
+def create_login():
     body = request.get_json(silent = True)
-
+    
     if body is None:
         return { "message": "Debes enviarme un body" }, 404
     
     if 'email' not in body or 'password' not in body:
         return { "message": "Datos incompletos" }, 404
-
+    
     user = db.session.execute(select(User).where(User.email == body['email'])).scalar_one_or_none()
     if user is None:
         return { "message": "El usuario no existe" }, 404
@@ -67,7 +67,7 @@ def login():
 
 @api.route('/shops')
 def get_all_shops():
-    all_shops = db.session.execute(select(Shop))
+    all_shops = db.session.execute(select(Shop)).scalars().all()
     all_shops = list(map(lambda shop: shop.serialize(), all_shops))
 
     return { "shops": all_shops }, 200
