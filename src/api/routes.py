@@ -17,7 +17,7 @@ CORS(api)
 def handle_hello():
 
     response_body = {
-        "message": "Hello! I'm a message that came from the backend, check the network tab on the google inspector and you will see the GET request"
+        "message": "Hello World!"
     }
 
     return jsonify(response_body), 200
@@ -57,10 +57,10 @@ def create_login():
     
     user = db.session.execute(select(User).where(User.email == body['email'])).scalar_one_or_none()
     if user is None:
-        return { "message": "El usuario no existe" }, 404
+        return { "message": "El usuario no existe" }, 400
 
     if not check_password_hash(user.password, body['password']):
-        return { "message": "Usuario o contraseña no válida" }, 404
+        return { "message": "Usuario o contraseña no válida" }, 401
     
     access_token = create_access_token(identity = user.id)
     return { "token": access_token, "user_id": user.id }, 200
@@ -89,7 +89,7 @@ def get_shop_products(shop_id):
 @jwt_required()
 def make_sale():
     body = request.get_json(silent = True)
-
+    print(body)
     if body is None:
         return { "message": "Debes enviarme los productos para la compra" }, 404
     
